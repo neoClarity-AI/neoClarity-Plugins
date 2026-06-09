@@ -1,12 +1,12 @@
 {
-  "name": "aos-factory",
+  "name": "neoclarity-plugins",
   "owner": {
     "name": "neoClarity LLC",
     "email": "github@neoclarity.ai"
   },
   "plugins": [
     {
-      "name": "Open AOS Factory",
+      "name": "aos-factory",
       "source": "./aos-factory",
       "description": "Build and maintain Agentic Operating System (AOS) instances.",
       "version": "1.0.0"
