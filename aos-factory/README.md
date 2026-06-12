@@ -28,24 +28,24 @@ Follow these steps to create a new in **Claude Cowork** project. You will use th
    - **For Mac:** 
      - TBD
 2. Open **Claude Desktop**. Using **Claude Desktop**:
-  
+
     - Click on the **Cowork** tab at the top of the lefthand navigation pane.
-  
+      
     - Click on **Projects** in the nav menu.
-  
+      
     - Click on the **New project** button.
-  
+      
     - Click on **Use an existing folder** option.
-  
+      
     - Click on **Select a folder...**
-  
+      
     - Double-click on the **Claude** folder, double-click on the **AOS Workspace** folder, then click on the **Select Folder** button.
-  
+      
     - Change the **Name** to **AOS Workspace**.
       No instructions or add
-  
+      
     - Click on the **Create** button.
-  
+
 
 
 You now have a workspace for your AOS. Before you can create your AOS, you first need to install the **AOS Factory** plugin.
@@ -86,16 +86,26 @@ You now have a workspace for your AOS. Before you can create your AOS, you first
 You're now ready to create your first AOS instance!
 
 
-## Usage
+## Create your first AOS Instance
 
 To create your first AOS instance, invoke the build process as follows. The factory will walk you through the steps.
 
-- **In Claude Cowork:** Open the **AOS Workspace** project, then type the prompt "Build an AOS"
-- **In Claude Code:** Type the command "/build-aos"
+1. **Open a new session** in your **AOS Workspace** project, then issue the prompt: Build an AOS.
+2. **Start the build.** Type: `Build my AOS` — Claude will open the master builder and begin the setup interview.
+3. **Answer the interview questions.** The builder acts as an executive coach and collaborator, asking about your work style, the agents you want, and how you want the system to behave. It recommends sensible defaults and documents decisions as it goes. Recommended first agents to install: 
+4. **Review the proposed files.** Before anything is created, Claude shows you exactly what it plans to write.
+5. **Type `Proceed`** to authorize file creation. Nothing is written until you do.
 
-After your AOS instance is created, refer to the user guide for that instance: `/[aos-instance-folder]/docs/aos-user-guide.html`. The [aos-instance-folder] is the name of your AOS instance in kebab format (ex. `Personal AOS` would be `personal-aos`).
+After your AOS instance is created, start a new conversation in the AOS Workspace. Here are some prompts to get you started.
 
+- Show me the daily brief.
+- Show me the AOS User Guide.
+- Take me on a guided tour of my new AOS.
+- Let's setup the scheduled tasks.
 
+**Best practice:** Always start a new conversation when you switch topics. Conversations that grow too long invite drift, which causes erratic results.
+
+**Pro tip:** You can multi-task in Claude Cowork. While Claude is working on one request, you can navigate back to the **AOS Workspace** home page and start a new conversation. You can have as many conversations going as you like. But, keep in mind that you'll be burning through your session limits faster.
 
 ## Workspace root files
 
