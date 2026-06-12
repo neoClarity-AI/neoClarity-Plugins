@@ -27,26 +27,33 @@ Follow these steps to create a new in **Claude Cowork** project. You will use th
      - Verify the directory exists: `chdir %USERPROFILE%"\Claude\AOS Workspace"` 
    - **For Mac:** 
      - TBD
-2. Open **Claude Desktop**. 
-  Using Claude Desktop:
-  - Click on the **Cowork** tab at the top of the lefthand navigation pane.
-  - Click on **Projects** in the nav menu.
-  - Click on the **New project** button.
-  - Click on **Use an existing folder** option.
-  - Click on **Select a folder...**
-  - Double-click on the **Claude** folder, double-click on the **AOS Workspace** folder, then click on the **Select Folder** button.
-  - Change the **Name** to **AOS Workspace**.
-    No instructions or add
-  - Click on the **Create** button.
+2. Open **Claude Desktop**. Using **Claude Desktop**:
+  
+    - Click on the **Cowork** tab at the top of the lefthand navigation pane.
+  
+    - Click on **Projects** in the nav menu.
+  
+    - Click on the **New project** button.
+  
+    - Click on **Use an existing folder** option.
+  
+    - Click on **Select a folder...**
+  
+    - Double-click on the **Claude** folder, double-click on the **AOS Workspace** folder, then click on the **Select Folder** button.
+  
+    - Change the **Name** to **AOS Workspace**.
+      No instructions or add
+  
+    - Click on the **Create** button.
+  
 
 
 You now have a workspace for your AOS. Before you can create your AOS, you first need to install the **AOS Factory** plugin.
 
 ### Install AOS Factory plugin
 
-1. Open **Claude Desktop** (from previous step)
-   Using Claude Desktop:
-
+1. Using **Claude Desktop**:
+   
    - Click on the **Cowork** tab at the top of the lefthand navigation pane.
    - Click on **Customize** button
    - Click on **Browse plugins** button
@@ -61,7 +68,7 @@ You now have a workspace for your AOS. Before you can create your AOS, you first
    - Verify that the **Install** button had changed to a **Manage** button.
      The plugin is now installed!
    - Click the back arrow ()
-
+   
 2. To complete the setup, copy the template files into your AOS workspace root folder. Here's how:
 
    - Click on the **Cowork** tab at the top of the lefthand navigation pane.
@@ -88,9 +95,11 @@ To create your first AOS instance, invoke the build process as follows. The fact
 
 After your AOS instance is created, refer to the user guide for that instance: `/[aos-instance-folder]/docs/aos-user-guide.html`. The [aos-instance-folder] is the name of your AOS instance in kebab format (ex. `Personal AOS` would be `personal-aos`).
 
+
+
 ## Workspace root files
 
-**CLAUDE.md** (project / session-start instructions) and **aos-router.md** (instance router) must be in your workspace root folder. Both of these files are required for your AOS to work correctly.
+The AOS Factory plugin contains two template files (**CLAUDE.md** and **aos-router.md**) that must be in your workspace root folder. Both of these files are required for your AOS to work correctly.
 
 These two files contain important instructions that include:
 
