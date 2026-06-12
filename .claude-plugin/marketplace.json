@@ -9,7 +9,7 @@
       "name": "aos-factory",
       "source": "./aos-factory",
       "description": "Build and maintain Agentic Operating System (AOS) instances.",
-      "version": "1.0.0"
+      "version": "1.0.5"
     }
   ]
 }

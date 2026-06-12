@@ -1,18 +1,9 @@
 ---
 name: build-aos
 description: "Build a complete Agentic Operating System (AOS) instance from scratch. Use when the user wants to create, set up, build, or stand up their AOS, an 'agentic operating system', or an additional AOS instance — including its folder structure, the four required governance agents, at least one optional productive agent, global workflows, templates, configs, logs, and the AOS User Guide. This is the master entry-point builder; it orchestrates the individual agent builders."
-builder_version: 1.0.0
-schema_version: 1.0.0
-file_type: aos_builder
-status: active
 ---
 
-
 # Build AOS
-
-## Canonical Schemas (bundled)
-
-This skill is self-contained. Follow `references/generated-file-schemas.md` for the exact heading schemas of every generated file (agent instructions, configs, memory, workflows, templates, decision logs, build summaries — `Section 11`, `Section 13`, `Section 16.1`–16.5). Follow the same file for the optional-agent roster order (`Section 7.2`) and the AOS User Guide skeleton (`Section 16.6`). Use these as the source of truth; do not improvise headings or roster order.
 
 ## Builder Purpose
 
@@ -22,9 +13,9 @@ It produces a working AOS the user can operate immediately. It does not modify t
 
 ## When to Use This Builder
 
-Use this builder when the user wants to create their AOS for the first time, or to stand up an additional AOS instance. The user typically reaches it through the `build-aos` skill.
+Use this builder when the user wants to create their AOS for the first time, or to stand up an additional AOS instance. The user typically reaches it through the root entry `/build-aos.md`.
 
-Do not use it to add a single agent to an existing AOS — route that to the matching `build-[agent-name]-agent` skill.
+Do not use it to add a single agent to an existing AOS — route that to the relevant `/builders/build-[agent-name]-agent.md`.
 
 ## Builder Operating Mode
 
@@ -42,11 +33,11 @@ Follow the batch pattern (Section 9.1):
 2. Summarize what the user said.
 3. Recommend defaults for anything vague.
 4. Ask for approval on important design decisions.
-5. Generate a build summary.
+5. Generate a build plan / pre-build preview.
 6. Ask the user to type Proceed before creating files.
 ```
 
-If the user asks to move faster, reduce the number of questions and rely more on documented assumptions.
+The step-5 preview is shown before any files are created; it is distinct from the post-build AOS Setup Summary (Section 13, 9.1). If the user asks to move faster, reduce the number of questions and rely more on documented assumptions.
 
 ## Discovery Questions
 
@@ -63,7 +54,7 @@ Ask in small batches:
 ## Recommended Defaults
 
 - AOS name: a short, file-safe slug derived from the user's stated purpose (for example `work-aos`).
-- Required agents: all four governance agents, always (Security, Memory, Chief of Staff, Review / Reflection).
+- Required agents: all four governance agents, always (Security, Memory, Chief of Staff, Review).
 - Starter optional agent: recommend the one that best matches the user's top stated domain; if unclear, recommend the Task / Commitment Agent.
 - Permissions: adopt the global three-level model unchanged; capture any user-specific tightening in `/configs/global-permissions.md`.
 - Operating rhythms: install all five review workflows plus the four supporting workflows.
@@ -94,6 +85,8 @@ Create the AOS instance as a **sibling folder** of the framework, named for the 
 
 ```text
 /[aos-name]
+  aos-manifest.md
+  aos-map.md
   /agents
   /workflows
   /memory
@@ -143,17 +136,17 @@ Create these global files at the instance root (Section 6):
 /docs/aos-user-guide.html
 ```
 
-Generate each markdown file with the file-type schema from Section 16 and lightweight YAML frontmatter (Section 15). Generate `/docs/aos-user-guide.html` from the skeleton in Section 16.6, including an Invocation Reference table scoped to the agents actually installed, with metadata carried via meta tags / an HTML comment rather than YAML.
+Generate each markdown file with the file-type schema from Section 16 and lightweight YAML frontmatter (Section 15), stamping `spec_version` (and `aos_version` on instance files) per the Section 15 stamping rule. Generate `/docs/aos-user-guide.html` as a **projection** (Sections 14.8, 16.6): assemble it from the skeleton plus current instance data (registry, map, permissions), including a mandatory Table of Contents (with in-page anchors), a seeded Change Log immediately after the TOC, and an Invocation Reference table scoped to the agents actually installed; carry metadata via meta tags / an HTML comment rather than YAML. The guide is regenerable, so it is treated as a definition file with its Change Log entries as the data input. Run the Section 16.6 consistency checks before finishing.
 
 ## Required Agent Orchestration
 
-Build all four governance agents by invoking these skills in order:
+Build all four governance agents by invoking their builders in order (governance before productivity — Section 1.6.2):
 
 ```text
-build-security-agent
-build-memory-agent
-build-chief-of-staff-agent
-build-review-agent
+/builders/build-security-agent.md
+/builders/build-memory-agent.md
+/builders/build-chief-of-staff-agent.md
+/builders/build-review-agent.md
 ```
 
 Each builder creates that agent's standard file set (Section 5.1). Required-agent interviews are short because their purpose is standardized (Section 26).
@@ -162,20 +155,20 @@ Each builder creates that agent's standard file set (Section 5.1). Required-agen
 
 - Present the optional roster (Section 7.2) in its defined order.
 - The user **must** select at least one optional productive agent before setup is considered complete (Sections 2.3, 7.2). Do not finish setup with zero optional agents.
-- For each selected agent, invoke the matching `build-[agent-name]-agent` skill.
+- For each selected agent, invoke `/builders/build-[agent-name]-agent.md`.
 - Optional agents not selected remain `available` (their builder files already exist).
 
 ## Registry and Map Updates
 
-- Update `/configs/agent-registry.md` with one row per agent: status, required flag, builder file, agent folder, notes.
+- Update `/configs/agent-registry.md` with one row per agent: status, required flag, builder file, agent folder, notes. The Chief of Staff entry must note joint ownership of `/aos-router.md` (Section 10.3).
 - Update `/aos-map.md` to distinguish installed, available-but-not-installed, required core, optional productive, paused, and retired agents.
 - Log the build in `/logs/aos-decision-log.md` and `/logs/change-log.md`.
-- Record builder and schema versions in `/aos-manifest.md`.
+- In `/aos-manifest.md`, set `AOS Version` to the instance's initial `aos_version` **1.0.0** and `Spec Version` to the `spec_version` this instance was generated from (Sections 14.3, 14.3.1). Stamp every generated file's frontmatter with that `spec_version`, and instance files with `aos_version` (Section 15).
 - **Update `/aos-router.md`** (workspace root, sibling to all instance folders): add the new instance slug to the `applies_to` front-matter list; add a classification-signals entry under §2 using the routing signals gathered in the interview (email aliases, sender domains, project keywords); if this is the first non-factory instance, set it as the default instance in §2; bump `last_updated` to today's date. Log this change in `aos-factory/logs/factory-routing-decision-log.md`.
 
 ## Instance Routing Signals
 
-When this instance shares an input channel with another (the AOS-03 case, where one inbox feeds both `work-aos` and `personal-aos`), routing only produces different results once the instances' signals diverge. During the build, populate the instance-specific signals the router relies on so it can resolve automatically instead of asking every time:
+When this instance shares an input channel with another (e.g. one inbox feeds both `work-aos` and `personal-aos`), routing only produces different results once the instances' signals diverge. During the build, populate the instance-specific signals the router relies on so it can resolve automatically instead of asking every time:
 
 - Email aliases and sender domains tied to this instance → capture in `/memory/user-profile.md` and `/memory/people.md`.
 - This instance's project names → ensure `/memory/projects.md` is populated (the router matches `[instance]/projects` names).
@@ -195,35 +188,22 @@ Confirm the AOS is complete (Section 27):
 [ ] Agent registry has an entry for every agent.
 [ ] AOS map is present and current.
 [ ] Global permissions, tool access matrix, workflows, templates, and logs exist.
-[ ] AOS User Guide (/docs/aos-user-guide.html) exists with an Invocation Reference scoped to installed agents.
-[ ] aos-manifest.md records AOS, builder, and schema versions.
+[ ] AOS User Guide (/docs/aos-user-guide.html) exists with a TOC, seeded Change Log, and Invocation Reference scoped to installed agents; Section 16.6 consistency checks pass.
+[ ] aos-manifest.md records AOS Version (initial 1.0.0) and Spec Version; generated files carry spec_version (instance files also aos_version).
 [ ] /aos-router.md applies_to list includes this instance and §2 has its classification signals.
 ```
 
-The Review / Reflection Agent audits completeness and consistency; the Security / Permissions Agent audits permissions and tool access; the Memory Agent audits memory routing and boundaries.
+The Review Agent audits completeness and consistency; the Security Agent audits permissions and tool access; the Memory Agent audits memory routing and boundaries.
 
 ## AOS Setup Summary
 
-Produce a summary after the build:
+Produce a summary after the build (Section 13, 9.3 step 10). This is the post-build artifact, distinct from the step-5 pre-build preview:
 
-```markdown
-# AOS Setup Summary
+- **AOS name and location:** the instance slug and its sibling-folder path.
+- **Agents installed:** the four required governance agents plus each selected optional productive agent, with status.
+- **Files and folders created:** the instance tree, global files, workflows, templates, and the AOS User Guide.
+- **Key decisions and preferences captured:** name, autonomy/approval settings, and routing signals.
+- **Routing:** confirmation that `/aos-router.md` now lists this instance and its §2 classification signals.
+- **Open questions and next steps:** optional agents not yet installed and how to add them later (`Build the [X] Agent`).
 
-## AOS Name and Location
-
-## Folders Created
-
-## Global Files Created
-
-## Required Agents Built
-
-## Optional Agents Built
-
-## Permissions and Tool Access Baseline
-
-## Operating Rhythms Installed
-
-## Open Questions
-
-## Suggested Next Steps
-```
+Save each agent's own build record to `/agents/[agent-name]-agent/logs/[agent-name]-build-summary.md` (Section 13).
