@@ -8,7 +8,7 @@
     {
       "name": "aos-factory",
       "source": "./aos-factory",
-      "description": "Build and maintain Agentic Operating System (AOS) instances.",
+      "description": "1.0.5. Build and maintain Agentic Operating System (AOS) instances.",
       "version": "1.0.5"
     }
   ]
