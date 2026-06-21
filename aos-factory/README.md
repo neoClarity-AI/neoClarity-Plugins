@@ -2,7 +2,7 @@
 
 The **Open AOS Factory** builds and maintains one or more **Agentic Operating System (AOS)** instances. Each AOS is a personal or professional AI standardized operating environment composed of specialized agents, workflows, memory files, templates, and configuration files that work together to create a complete agentic system. The factory guides both technical and non-technical users through setup via a conversational interview, produces all files automatically once approved, and can add or rebuild individual agents at any time. Although this particular implementation is configured to run on Claude Cowork (for non-technical users) or Claude Code (for developers), it can be easily ported to work with Codex and possibly other platforms.
 
-The **Open AOS Factory** is an open-source project locate here: https://github.com/neoClarity-AI/Open-AOS-Factory
+The **Open AOS Factory** is an open-source project located here: https://github.com/neoClarity-AI/Open-AOS-Factory
 
 **What Is an AI Agent?**
 
