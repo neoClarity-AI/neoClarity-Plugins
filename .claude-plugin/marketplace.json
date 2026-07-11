@@ -1,15 +1,14 @@
 {
-  "name": "neoclarity-plugins",
+  "name": "open-aos-factory",
   "owner": {
-    "name": "neoClarity LLC",
+    "name": "Open AOS Factory",
     "email": "github@neoclarity.ai"
   },
   "plugins": [
     {
       "name": "aos-factory",
-      "source": "./aos-factory",
-      "description": "1.0.5. Build and maintain Agentic Operating System (AOS) instances.",
-      "version": "1.0.5"
+      "source": "./claude-plugin/aos-factory",
+      "description": "Agentic Operating System (AOS) Factory — builders that stand up a complete AOS instance (five required governance agents, optional productive agents, workflows, templates, configs, logs, and a User Guide) and add or rebuild individual agents."
     }
   ]
 }
