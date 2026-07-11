@@ -1,73 +1,114 @@
 ---
 name: build-aos
-description: Build a complete Agentic Operating System (AOS) instance from scratch. Use when the user wants to create, set up, build, or stand up their AOS or 'agentic operating system' — including its folder structure, the five required governance agents (Security, Memory, Chief of Staff, Review, Feedback), at least one optional productive agent, global workflows, templates, configs, logs, and the AOS User Guide. Master entry point; orchestrates the build-agent engine per agent. No files are created until the user types exactly Proceed.
+description: Build a complete Agentic Operating System (AOS) instance from scratch — run the interactive setup interview, create the instance folder structure and global files, provision the AOS Workspace root, build the required governance agents and the user's selected optional productive agents, and produce an AOS setup summary. The master AOS builder. Use when the user asks to set up, create, stand up, or build a new AOS, an "agentic operating system", or an additional AOS instance. To add or rebuild a single agent inside an existing instance instead, use the build-agent skill.
+spec_version: 2.2.2
 ---
-
-
 # Build AOS
 
 ## Builder Purpose
 
-Build a complete Agentic Operating System (AOS) instance from the AOS Factory: the instance folder structure (§4), the global files (§6), the five required governance agents, at least one user-selected optional productive agent (§2.3, §7), the global workflows and templates (§17, §18), and the AOS User Guide (§16.6). The design spec is the single source of truth (§1.6.1); this builder is a rendering of it.
+Build a complete AOS instance: run the interactive setup interview, create the
+instance folder structure and global files, provision the AOS Workspace root,
+build the required governance agents and the user's selected optional productive
+agents, and produce an AOS setup summary. This is the master AOS builder (§12.1).
+It reads the factory-shipped design artifacts — `agent-catalog.yaml` (§7A), the
+`agent-specs/` profiles and interviews (§7B, §7C), and `aos-interviews.md`
+(§7C) — and never hand-authors identity or narrative those sources already
+provide.
+
+> Packaged as a Claude plugin skill. The design artifacts referenced below
+> (`agent-catalog.yaml`, `agent-specs/`, `aos-interviews.md`) ship with the
+> factory framework; resolve them from the installed factory / plugin context.
 
 ## When to Use This Builder
 
-- The user asks to create, set up, build, or stand up their AOS / agentic operating system.
-- Invoked via the root entry pointer `/build-aos.md` or directly.
-- Not for adding a single agent to an existing instance — that is `/builders/build-agent.md` (§9.4).
+Use when the user asks to set up, create, or build a new AOS instance. To add a
+single agent to an existing instance instead, use the `build-agent` skill (§9.4).
+Maintaining or refreshing the framework files themselves is a separate, manually
+approved operation (§8.4, §14.4).
 
 ## Builder Operating Mode
 
-Coach + collaborator (§1.5): explain concepts in coach mode, switch to collaborator mode for design choices, recommend sensible defaults, ask approval on important decisions, move forward with documented assumptions on low-risk details, defer to the user. Default to dry-run / preview; create no file until the user types exactly `Proceed` (§3.1, §9.1). Non-destructive by default; every overwrite of an existing file is listed and separately approved (§2.4, §2.5, §3.2).
+Combine coach and collaborator behavior (§1.5): explain in coach mode when a
+concept needs it, switch to collaborator mode for design choices, recommend
+sensible defaults, and move forward on documented assumptions for low-risk
+details. Default to **dry-run / preview**: describe what will be created and gate
+every file-creating step behind the user typing exactly `Proceed` (§3.1, §9.1).
+Approval is action-specific (§2.5). Never overwrite, delete, move, or rename an
+existing file without a separate `Proceed` (§2.4, §3.2). Creating new files and
+folders is Level 1 safe-autonomous (§3.3) but is still previewed as part of the
+build plan before `Proceed`.
 
 ## Interview Flow
 
-Execute the scripted AOS setup interview in `/aos-interviews.md` (§7C) using the §9.1 batch pattern:
+Follow the §9.1 batch pattern: (1) ask a small batch of questions, (2) summarize
+what the user said, (3) recommend defaults for anything vague, (4) ask approval on
+important design decisions, (5) generate a build plan / pre-build preview, (6) ask
+the user to type `Proceed` before creating files. Execute the scripted AOS setup
+interview in `aos-interviews.md` (§7C): the script is normative for question
+content, order, and captured fields; delivery stays conversational (paraphrase
+allowed; never add, remove, or reorder questions). Fast path (move-faster
+exception, §7C.4): questions marked `skippable: yes` resolve to their `default:`
+values; no other question may be dropped.
 
-1. Ask a small batch of questions.
-2. Summarize what the user said.
-3. Recommend defaults for anything vague.
-4. Ask for approval on important design decisions.
-5. Generate the build plan / pre-build preview (Files to Create / Decisions Applied / Assumptions / Approval).
-6. Ask the user to type `Proceed` before creating files.
+The step-5 pre-build preview uses this block (§9.1):
 
-The script is normative for question content, order, and captured fields; delivery is conversational — paraphrase allowed, never adding, removing, or reordering questions. Fast path (only when the user explicitly asks to move faster): `skippable: yes` questions resolve to their defaults; no other question may be dropped (§7C.4).
+```markdown
+## Files to Create
+## Decisions Applied
+## Assumptions
+## Approval
+[the Proceed ask — type exactly `Proceed` to create the files above]
+```
 
 ## Discovery Questions
 
-Defined in `/aos-interviews.md`; this builder references that script and does not restate it (§12.1). The script covers AOS purpose, domains, the AOS name (proposed by the builder, modifiable by the user, rendered as a file-safe slug per §29), optional-agent selection, and tool/approval baselines.
+Defined by the scripted AOS setup interview in `aos-interviews.md` (§7C) —
+purpose, instance name, optional-agent selection, memory seeds, and optional
+call name. This builder references that script and does not restate it
+(§12.1).
 
 ## Recommended Defaults
 
-Defaults and `skippable` markers are carried per-question in `/aos-interviews.md`. General posture: recommend the default, note the assumption, and keep moving (§1.5); required governance agents use standardized choices with defaults (§26).
+Defined by the `default:` values in `aos-interviews.md` (§7C): propose an
+instance name from the stated purpose; recommend agents by the stated
+aos-purpose category — Inbox + Task + Calendar + Document for Personal
+Productivity, Project Manager + Task + Document for Project Management,
+Personal CRM + Task + Calendar for Client Specific, and the full §7.2 roster
+with no default for Other; seed memory empty and never fabricate; no call name
+unless requested. This builder references that script and does not restate
+it. The §3 permission model
+applies unchanged by default — autonomy is no longer asked about at setup;
+instance-specific tightening or loosening happens later in
+`/configs/global-permissions.md` (§3.5).
 
 ## AOS Setup Sequence
 
-Follow §9.3:
+Follow §9.3, gating file creation on `Proceed`:
 
 ```text
-1. Start the AOS setup interview (above).
-2. Create the top-level folder structure (§4) as a sibling AOS root (§4.1).
-3. Provision the AOS Workspace root: ensure /CLAUDE.md exists, copying the
-   factory's shipped example (templates/CLAUDE.md, §28.2). Create it if
-   absent; never overwrite an existing root file without a separate Proceed.
-4. Create global config, memory, log, workflow, template, inbox, and archive
-   files (§6).
-5. Confirm the generic build engine (/builders/build-agent.md) and every
-   approved agent's design artifacts (catalog entry, profile, interviews)
-   exist at the factory root.
-6. Build the five required governance agents.
-7. Ask the user to select at least one optional productive agent.
-8. Build the selected optional agents.
-9. Update /configs/agent-registry.md and /aos-map.md.
-10. Produce the AOS setup summary (/logs/aos-build-summary.md).
+0. The factory framework already exists (this build runs from it).
+1. Start the user-facing AOS setup interview (aos-interviews.md).
+2. Create the top-level folder structure (see below), as a sibling AOS root (§4.1).
+3. Provision the AOS Workspace root: ensure /aos-router.md and /CLAUDE.md exist,
+   copying them from the factory's shipped example copies (templates/aos-router.md,
+   templates/CLAUDE.md; §28.2). Create if absent; if either already exists, do
+   not overwrite without a separate Proceed (§2.4, §3.2, §4.1).
+4. Create global config, memory, log, workflow, template, inbox, and archive files.
+5. Confirm the generic build engine and every approved agent's design artifacts
+   (catalog entry, profile, interviews) exist.
+6. Build the required governance agents.
+7. Ask the user to select at least one optional productive agent (§2.3, §7.2).
+8. Build the selected optional agents (via the build-agent skill).
+9. Update the agent registry and AOS map.
+10. Offer to schedule the rhythmic workflows as Cowork Scheduled Tasks (see below).
+11. Produce the AOS setup summary (/logs/aos-build-summary.md).
 ```
-
-All instance paths resolve against the target AOS root established in step 2; factory paths resolve against the factory root (§4.1). File creation waits for `Proceed`.
 
 ## Folder Structure to Create
 
-The §4 tree at `/[aos-name]/`:
+Use the §4 top-level tree, created as a sibling AOS root named for the user's
+chosen AOS name (§4.1):
 
 ```text
 /[aos-name]
@@ -82,7 +123,7 @@ The §4 tree at `/[aos-name]/`:
   /configs
   /docs
   /outputs
-    /[agent-name]-agent      (one per installed agent, created at that agent's build)
+    /[agent-name]-agent      (one subfolder per installed agent; §5.1)
   /inbox
     /processed
   /archive
@@ -90,76 +131,106 @@ The §4 tree at `/[aos-name]/`:
 
 ## Global Files to Create
 
-The §6 list, each rendered per its §16 schema with §15.3 frontmatter (`spec_version: 2.2.0` + the instance `aos_version`, initially 1.0.0 per §14.3.1):
+Use the §6 list. Stamp every generated file's frontmatter with `spec_version`
+(and, for instance files, `aos_version`; §15). Seed data files empty or with only
+user-provided content — never fabricate (§14.8, §20.3):
 
 ```text
-/aos-manifest.md                          (§14.3 schema; aos_version 1.0.0)
-/aos-map.md                               (§10.4 schema)
-/configs/global-permissions.md            (§16.11 seed: the three §3.4 levels mapping §3.2/§3.3)
-/configs/agent-registry.md                (§10.3 table)
-/configs/tool-access-matrix.md            (§22 schema; owned by the Security Agent)
-/memory/user-profile.md                   (§16.2 / §20.2)
+/aos-manifest.md                         (§14.3 schema; aos_version 1.0.0)
+/aos-map.md                              (§10.4 schema)
+/configs/global-permissions.md           (§16.12 seed — the three §3.4 levels)
+/configs/agent-registry.md               (§10.3 table)
+/configs/tool-access-matrix.md           (§22; every tool defaults Not configured)
+/memory/user-profile.md
 /memory/preferences.md
 /memory/people.md
 /memory/projects.md
 /memory/decisions.md
-/memory/agent-learnings-index.md          (§6.1 index table)
-/logs/aos-decision-log.md                 (§16.5)
-/logs/change-log.md                       (§16.8 entries)
-/logs/feedback-log.md                     (§16.7)
-/workflows/daily-startup-workflow.md      (§17.1: factory-vs-instance check first; 9-category startup brief)
-/workflows/end-of-day-shutdown-workflow.md (§17.2)
-/workflows/weekly-review-workflow.md      (§17.3: includes the advertising check)
-/workflows/monthly-review-workflow.md     (§17.4: guide regeneration + aos_version reconciliation + Feedback self-examination)
-/workflows/quarterly-review-workflow.md   (§17.5: advertising re-raise + retirement signals; anti-nagging rule)
-/workflows/inbox-to-task-workflow.md      (§17.6: /inbox/processed move pre-authorized within the approved workflow)
-/workflows/project-kickoff-workflow.md    (§17.7)
-/workflows/decision-capture-workflow.md   (§17.8)
-/workflows/memory-review-workflow.md      (§17.9)
-/templates/status-report-template.md      (§18.1)
-/templates/project-brief-template.md      (§18.2)
-/templates/decision-entry-template.md     (§18.3: embeds the §16.5 entry block)
-/templates/handoff-summary-template.md    (§18.4)
-/templates/approval-request-template.md   (§18.5: the five §3.1 elements)
-/templates/memory-entry-template.md       (§18.6: embeds the §16.2/§20.3 entry block)
-/docs/aos-user-guide.html                 (§16.6 skeleton — see below)
+/memory/agent-learnings-index.md         (§6.1 index table)
+/logs/aos-decision-log.md
+/logs/change-log.md
+/logs/feedback-log.md                    (§16.7)
+/workflows/daily-startup-workflow.md     (§17.1 — includes instance-resolution step
+                                          and the nine-category startup brief)
+/workflows/end-of-day-shutdown-workflow.md
+/workflows/weekly-review-workflow.md
+/workflows/monthly-review-workflow.md
+/workflows/inbox-to-task-workflow.md
+/workflows/project-kickoff-workflow.md
+/workflows/decision-capture-workflow.md
+/workflows/memory-review-workflow.md
+/templates/status-report-template.md
+/templates/project-brief-template.md
+/templates/decision-entry-template.md
+/templates/handoff-summary-template.md
+/templates/approval-request-template.md
+/templates/memory-entry-template.md
+/docs/aos-user-guide.html                (§16.6 skeleton — generate the TOC,
+                                          anchors, and seeded Change Log complete;
+                                          Invocation Reference scoped to installed
+                                          agents; run the §16.6 consistency checks)
 ```
-
-**AOS User Guide generation (mandatory rules, §16.6).** Generate from the §16.6 skeleton: header metadata (file_type documentation, AOS name, aos_version, spec_version, last_updated), title/subtitle, then a Table of Contents listing — in order — Change Log, Introduction, Folder Orientation, Agents Overview, Core Rules & Safety, Operating Rhythms, Managing Agents, Invocation Reference. Every section carries its stable `id` anchor; every TOC entry is an in-page link; the TOC mirrors exactly the sections emitted. Seed the Change Log (immediately after the TOC) with one dated entry: "[last_updated] — Initial guide generated during AOS setup." The Invocation Reference states that trigger phrases are matched by intent and `Proceed` is the only exact-string command, carries the global trigger table scoped to the installed agents, and points to each installed agent's `## Example Requests` section. The guide is invalid until the §16.6 consistency checks pass (every TOC entry resolves, every section has a TOC entry, Change Log present and non-empty).
 
 ## Required Agent Orchestration
 
-Build, in order, by invoking `/builders/build-agent.md` per agent: Security Agent, Memory Agent, Chief of Staff Agent, Review Agent, Feedback Agent (§1.6.2 — governance before productivity). The Chief of Staff Agent's registry entry notes its ownership of the factory-vs-instance guard in `/CLAUDE.md` (§10.3, §16.10).
+Build all five required governance agents (Security, Memory, Chief of Staff,
+Review, Feedback; §7.1) by invoking the `build-agent` skill for each, resolving
+its catalog entry and `agent-specs/[agent-name]-agent/` folder. Required agents
+have shorter Initialization interviews (§7C.4). These agents cannot be omitted
+(governance before productivity, §1.6.2). Note the Chief of Staff's joint
+ownership of the AOS Workspace router in its registry entry (§10.3).
 
 ## Optional Agent Selection
 
-Present the §7.2 roster in order (Tutor, Inbox, Calendar, Task, Project Manager, Research, Writing, Document, Personal CRM, Automation). **At least one optional productive agent must be selected before setup is complete (§2.3, §7.2)** — do not close setup with zero. Build each selected agent via the generic engine. Unselected agents remain `Available` in the registry/map (§10.1, §10.4) and are surfaced later by the Review Agent's advertising checks (§17.3, §17.5).
+Enforce that at least one optional productive agent is chosen before setup is
+complete (§2.3, §7.2). Present the §7.2 roster with the recommended defaults;
+build each selected agent via the `build-agent` skill. Remaining optional
+agents stay `Available` and can be added later (§9.4).
 
 ## Registry and Map Updates
 
-After each agent build and at the end of setup, update `/configs/agent-registry.md` (§10.3) and `/aos-map.md` (§10.4) so every §7.3 agent appears with the correct status (Active / Available), tier, and folder. Record the setup in `/logs/change-log.md` and `/logs/aos-decision-log.md`; set the manifest (§14.3) with `aos_version: 1.0.0` and `spec_version: 2.2.0`.
+Update `/configs/agent-registry.md` (§10.3) and `/aos-map.md` (§10.4) to reflect
+each built agent (status `Active`), each `Available` uninstalled agent, and the
+instance's folder map. Record installed/active agents in `/aos-manifest.md`
+(§14.3). These are mixed/data files — update by targeted merge, never wholesale
+overwrite (§14.8).
+
+## Rhythmic Workflow Scheduling
+
+Offer a Cowork Scheduled Task for each of the four cadence-driven workflows —
+daily startup, end-of-day shutdown, weekly review, monthly review (§17.1–17.4)
+— invoking that workflow's routed execution (through the instance router,
+§16.10) on its cadence. This is offered, never assumed: present the standard
+cadence (§25) and the Review Agent's captured `review-timing` preference
+where set (§26); create a task only for each workflow the user accepts.
+Declining any or all leaves that workflow manually triggered. Do not schedule
+event-triggered workflows (inbox-to-task, project kickoff, decision capture,
+memory review; §17.5–17.8) — they run on their triggering event, not a
+cadence. Creating a Scheduled Task is Level 2 (§3.4): preview the proposed
+schedule and gate creation behind `Proceed`. Log each accepted schedule to
+`/logs/change-log.md`.
+
+Each task's instructions must contain exactly one line pointing to its
+workflow file, as an `@`-path reference against the instance root — e.g.
+`@/[aos-name]/workflows/daily-startup-workflow.md` — and nothing else; the
+workflow file is the single source of truth for the run's behavior.
 
 ## Validation Checklist
 
-Per §27, before declaring setup complete:
-
-```text
-[ ] Required folders (§4) and global files (§6) all exist.
-[ ] Five governance agents built and Active; at least one optional agent built.
-[ ] Every built agent passes the build-agent validation checklist (§5.1 file set).
-[ ] Registry, map, and manifest are consistent with each other and with the folders on disk.
-[ ] Catalog/profile/interview validation passes (§7A.5 V1–V8, §7B.5 V9–V13).
-[ ] Global permissions, tool access matrix, workflows, templates, and logs conform to their §16 schemas.
-[ ] AOS User Guide passes the §16.6 consistency checks.
-[ ] /CLAUDE.md exists at the AOS Workspace root (created from the shipped example if it was absent).
-```
+Run the §27 completeness checks before finishing: every required agent built and
+`Active`; at least one optional agent installed; all §6 global files present and
+frontmatter-stamped; the AOS Workspace root files provisioned; the user guide
+passes the §16.6 consistency checks (TOC ↔ anchors, Change Log present and
+non-empty); the registry, map, and manifest agree; every instance path resolved
+against the instance root (§4.1). Report and correct any gap before completing.
 
 ## AOS Setup Summary
 
-Save `/logs/aos-build-summary.md` (`file_type: build_summary`, §9.3/§15.4) with the §13-parallel schema at instance scope:
+Write `/logs/aos-build-summary.md` (file_type `build_summary`, §15.4) with the
+instance-scoped parallel of the §13 schema:
 
 ```markdown
-# AOS Setup Summary
+# [AOS Name] Build Summary
 
 ## Files Created
 ## Key Decisions

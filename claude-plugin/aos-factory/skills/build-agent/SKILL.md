@@ -1,46 +1,75 @@
 ---
 name: build-agent
-description: Build, add, restore, or rebuild any single approved AOS agent inside an existing AOS instance (e.g. 'Build the Research Agent', 'Add the Calendar Agent'). Generic engine covering all 15 approved agents: resolves the agent's catalog entry, profile, and interviews from the plugin's agent-specs, runs its scripted Initialization interview, and creates the standard agent file set. No files are created until the user types exactly Proceed.
+description: Build any one approved agent inside an existing AOS instance — execute that agent's initialization interview and instantiate its catalog entry, profile, and interviews into the standard agent file set. The generic build engine used both during initial AOS setup and to add an optional agent later. Use when the user says things like "build the Research Agent", "add a Calendar agent", "create the Inbox agent", or otherwise asks to add or rebuild a single agent in an AOS instance. To stand up a whole new AOS instance instead, use the build-aos skill.
+spec_version: 2.2.2
 ---
-
-
 # Build Agent (Generic Engine)
 
 ## Engine Purpose
 
-Build any one approved agent inside an existing AOS instance. This engine replaces the former per-agent builder files: it instantiates a validated agent-catalog entry (§7A) + profile (§7B) + interviews file (§7C) into the standard §5.1 agent file set. It is a builder-framework file, not a runtime agent (§7.5, §8.1).
+Build any one approved agent inside an AOS instance by executing that agent's
+Initialization interview and instantiating its validated catalog entry (§7A),
+profile (§7B), and interviews file (§7C) into the standard §5.1 file set. One
+generic engine provides build coverage for every approved agent (§8.1); there are
+no per-agent builder files. It is a builder-framework file, not a runtime agent
+(§7.5, §8.1).
+
+> Packaged as a Claude plugin skill. The design artifacts referenced below
+> (`agent-catalog.yaml`, `agent-specs/`) ship with the factory framework;
+> resolve them from the installed factory / plugin context.
 
 ## When to Use This Engine
 
-- During initial AOS setup, invoked by `/builders/build-aos.md` for each required governance agent and each selected optional agent.
-- Later, when the user asks to install an agent, e.g. "Build the Research Agent" (§9.4).
-- When restoring or rebuilding an agent's definition files after an authorized factory update (§14.4, `Proceed`-gated for any overwrite).
+Use during initial setup (driven by the `build-aos` skill) to build required
+and selected optional agents, and later to add an optional agent to an existing
+instance (§9.4) — e.g. "Build the Research Agent" resolves to `research-agent`.
 
 ## Operating Mode
 
-Coach + collaborator (§1.5). Default to dry-run / preview: no file is written until the user types exactly `Proceed` (§3.1, §9.1). Every overwrite of an existing file requires its own explicit listing and approval (§2.5, §3.2). Non-destructive by default (§2.4).
+Default to dry-run / preview and gate file creation behind the user typing
+exactly `Proceed` (§3.1, §9.1). Creating the new agent's files and folders is
+Level 1 safe-autonomous (§3.3) but is previewed in the build plan first. Never
+overwrite, move, or delete an existing file without a separate `Proceed` (§2.4,
+§3.2). Refuse to build an agent whose design artifacts fail the §7A.5/§10.3.1
+overlap and validation checks (Phase A must pass before Phase B, §7.5).
 
 ## Inputs
 
-Resolve the target agent from the invocation ("Build the Research Agent" → `research-agent`, per the §7.3 slugs), then load its three design artifacts from the factory root:
+Resolve the target agent from the invocation (e.g. "Build the Research Agent" →
+`research-agent`), then read all three design artifacts:
 
-1. Its entry in `/agent-catalog.yaml` (§7A) — identity and ownership.
-2. `/agent-specs/[agent-name]-agent/profile.md` (§7B) — behavioral narrative.
-3. `/agent-specs/[agent-name]-agent/interviews.md` (§7C) — scripted interviews.
+```text
+- the agent's catalog entry in agent-catalog.yaml (§7A) — identity/ownership
+- agent-specs/[agent-name]-agent/profile.md (§7B) — behavior narrative
+- agent-specs/[agent-name]-agent/interviews.md (§7C) — scripted interviews
+```
 
-Also required: the target AOS instance root (established by build-aos or confirmed with the user), and the instance's `/configs/agent-registry.md` and `/aos-map.md` for the §10.3.1 instance-scope overlap check. If any design artifact is missing, stop and report; do not hand-author a substitute (§1.6.1).
+Validate before building: the slug matches §7.3; `domains_owned` and
+`artifacts_owned` are pairwise-disjoint against the catalog and against every
+agent already in this instance registry (§7A.5, §10.3.1); no reserved governance
+token is claimed by a productive agent.
 
 ## Interview Execution
 
-Execute the agent's §7C Initialization interview. The script is normative for question content, order, and captured fields; delivery is conversational in the §9.1 batch pattern (ask, summarize, recommend, preview, `Proceed`). Paraphrase is allowed; never add, remove, or reorder questions. Fast path (only when the user explicitly asks to move faster): questions marked `skippable: yes` resolve to their `default:` values; no other question may be dropped (§7C.4).
+Execute the agent's §7C Initialization interview. The script is normative for
+question content, order, and captured fields; delivery is conversational per the
+§9.1 batch pattern (paraphrase allowed; never add, remove, or reorder questions).
+Fast path (§7C.4): questions marked `skippable: yes` resolve to their `default:`
+values; no other question may be dropped. Required agents have shorter scripts;
+optional productive agents ask about goals, scope, tools, output preferences,
+approval boundaries, and collaboration patterns (§26).
 
 ## Configuration Decisions
 
-Record every captured answer against its `captures:` target. Recommend defaults for anything vague; ask for approval on important design decisions; document assumptions for low-risk details (§1.5). Validate the agent against the instance before building: its `domains_owned` and `artifacts_owned` must not collide with the framework catalog's reserved domains or any agent already registered in this instance (§10.3.1).
+Map each captured answer to the file/field named in its `captures:` entry.
+Recommend defaults for anything left vague (§1.5); record low-risk assumptions in
+the pre-build preview's `## Assumptions` block. Tool requests are recorded as
+requests against `/configs/tool-access-matrix.md` and granted only by the
+Security Agent (§22) — never self-granted here.
 
 ## Files to Create
 
-The standard §5.1 set, all paths relative to the instance root:
+Create the standard §5.1 agent file set plus the empty outputs subfolder (§4):
 
 ```text
 /agents/[agent-name]-agent/[agent-name]-agent.md
@@ -50,53 +79,64 @@ The standard §5.1 set, all paths relative to the instance root:
 /agents/[agent-name]-agent/templates/[agent-name]-output-template.md
 /agents/[agent-name]-agent/configs/[agent-name]-config.md
 /agents/[agent-name]-agent/logs/[agent-name]-decision-log.md
-/outputs/[agent-name]-agent/          (empty standalone-deliverables folder, §4)
+/outputs/[agent-name]-agent/                    (empty; standalone deliverables, §4)
 ```
 
-Plus agent-specific supporting files only when useful to the agent's domain (§26). Present the full list in the §9.1 pre-build preview (Files to Create / Decisions Applied / Assumptions / Approval) and wait for `Proceed`.
+Stamp every generated file's frontmatter with `spec_version` and `aos_version`
+(§15). Builders may add agent-specific supporting files as needed (§5.1).
 
 ## Agent Instruction Generation Rules
 
-Generate `[agent-name]-agent.md` per the §11 schema with §15.2 frontmatter (`file_type: agent_instruction`, `agent_name`, `agent_status: active`, `required`, `aos_version`, `spec_version`, dates).
-
-- Render `Purpose`, `Responsibilities`, `Non-Responsibilities`, `Inputs`, `Outputs`, `Collaboration Rules`, `Approval Requirements` from the catalog entry (`one_line`, `domains_owned`, derived `non_responsibilities`, `inputs`, `outputs`, `collaborates_with`, `approval_required_actions` + `pre_authorized_actions`). Never hand-author identity.
-- Render `Workflows`, `Autonomy Rules`, `Escalation Rules`, `Operating Procedure`, `Quality Standards`, `Failure Modes`, `Example Requests`, `Maintenance Notes` from the profile's Operation section, tailored with the instance choices captured by the Initialization interview.
-- Use direct imperative language and must/should/may consistently; include examples (§32).
+Render `[agent-name]-agent.md` to the §11 schema. Draw the **identity** sections
+— Purpose (from `one_line`), Responsibilities (`domains_owned`), Non-Responsibilities
+(derived `non_responsibilities` — the SRP enforcer), Inputs, Outputs, Collaboration
+Rules (`collaborates_with`), and Approval Requirements (`approval_required_actions`
++ `pre_authorized_actions`) — from the catalog entry (§7A/§7B.4). Draw the
+**narrative** sections — Workflows, Autonomy Rules, Escalation Rules, Operating
+Procedure, Quality Standards, Failure Modes, Example Requests, Maintenance Notes —
+from the agent's profile Operation section (§7B), tailored with the instance
+choices captured in the interview. Do not duplicate catalog- or profile-owned
+content as hand-authored prose.
 
 ## Workflow Generation Rules
 
-Generate `[agent-name]-primary-workflow.md` per the §16.3 workflow schema (Purpose, When to Use, Inputs, Outputs, Steps, Decision Points, Approval Gates, Escalation Triggers, Completion Criteria), derived from the profile's Primary Workflow narrative and interview answers. Frontmatter per §15.3 (`file_type: workflow`, `owner: [agent-name]-agent`).
+Create `[agent-name]-primary-workflow.md` to the §16.3 schema, based on the
+profile's Primary Workflow. Add agent-specific workflows only where the profile or
+captured configuration calls for one.
 
 ## Memory Generation Rules
 
-Generate `[agent-name]-memory.md` and `[agent-name]-learnings.md` per the §16.2 memory schema, created once and seeded empty (data files, §14.8 — never overwritten by a later update). Learnings entries follow the §6.1 entry format and attribution rule. Add or update the agent's row in `/memory/agent-learnings-index.md`.
+Create `[agent-name]-memory.md` and `[agent-name]-learnings.md` to the §16.2 /
+§6.1 schemas, seeded empty (or with only user-provided seeds — never fabricated).
+Register the learnings file in `/memory/agent-learnings-index.md`. Memory and
+learnings are data files, owned by the agent thereafter (§14.8).
 
 ## Config Generation Rules
 
-Generate `[agent-name]-config.md` per the §16.1 config schema. `Inherited Rules` references `/configs/global-permissions.md`; `Tool Access` references `/configs/tool-access-matrix.md` and lists only agent-specific notes or requests — never restating or overriding global permissions or matrix grants (§3.5, §16.1, §22). If the catalog entry has `pre_authorized_actions`, add a one-line cross-reference to the catalog entry rather than restating them.
+Create `[agent-name]-config.md` to the §16.1 schema. `Inherited Rules` references
+`/configs/global-permissions.md` rather than duplicating it; `Tool Access`
+references `/configs/tool-access-matrix.md` as authoritative and lists only
+agent-specific notes (§16.1, §22). For an agent with `pre_authorized_actions`, add
+a one-line cross-reference to its catalog entry rather than restating them.
 
 ## Logging Rules
 
-Create `[agent-name]-decision-log.md` per the §16.5 append-only decision-log schema (newest on top; no deletions; corrections as new entries). Log the build itself to `/logs/change-log.md` (Type: MINOR — an agent built, §14.3.1/§16.8) and record must-log events per §19.3.
+Create `[agent-name]-decision-log.md` to the §16.5 append-only schema (newest on
+top; corrections added as new entries, never rewritten).
 
 ## Validation Checklist
 
-Before declaring the build complete (§27):
-
-```text
-[ ] All seven §5.1 files exist with correct §15 frontmatter (spec_version + aos_version stamps).
-[ ] /outputs/[agent-name]-agent/ exists.
-[ ] Instruction-file identity sections match the catalog entry; narrative sections trace to the profile.
-[ ] §10.3.1 overlap check passed (domains and artifacts pairwise disjoint at both scopes).
-[ ] /configs/agent-registry.md and /aos-map.md updated (status Active).
-[ ] /memory/agent-learnings-index.md row added.
-[ ] Build logged to /logs/change-log.md.
-[ ] Config references global permissions and the tool access matrix instead of duplicating them.
-```
+Confirm: all §5.1 files created and frontmatter-stamped; the instruction file
+matches §11 with identity from the catalog and narrative from the profile;
+non-responsibilities present (SRP); learnings file registered in the index; config
+references global permissions and the tool matrix without restating them; the
+outputs subfolder created; registry, map, and manifest updated for this agent;
+the §10.3.1 overlap check passed. Correct any gap before finishing.
 
 ## Handoff Summary
 
-Emit the §13 Build Summary and save it to `/agents/[agent-name]-agent/logs/[agent-name]-build-summary.md` (`file_type: build_summary`):
+Emit the §13 Build Summary as `/agents/[agent-name]-agent/logs/[agent-name]-build-summary.md`
+(file_type `build_summary`):
 
 ```markdown
 # [Agent Name] Build Summary
