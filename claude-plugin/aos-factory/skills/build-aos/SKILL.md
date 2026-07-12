@@ -1,7 +1,7 @@
 ---
 name: build-aos
 description: Build a complete Agentic Operating System (AOS) instance from scratch — run the interactive setup interview, create the instance folder structure and global files, provision the AOS Workspace root, build the required governance agents and the user's selected optional productive agents, and produce an AOS setup summary. The master AOS builder. Use when the user asks to set up, create, stand up, or build a new AOS, an "agentic operating system", or an additional AOS instance. To add or rebuild a single agent inside an existing instance instead, use the build-agent skill.
-spec_version: 2.2.2
+spec_version: 2.2.3
 ---
 # Build AOS
 
@@ -17,8 +17,8 @@ It reads the factory-shipped design artifacts — `agent-catalog.yaml` (§7A), t
 provide.
 
 > Packaged as a Claude plugin skill. The design artifacts referenced below
-> (`agent-catalog.yaml`, `agent-specs/`, `aos-interviews.md`) ship with the
-> factory framework; resolve them from the installed factory / plugin context.
+> (`agent-catalog.yaml`, `agent-specs/`, `aos-interviews.md`) ship at the
+> plugin root; resolve them relative to the installed plugin directory (§28.2).
 
 ## When to Use This Builder
 

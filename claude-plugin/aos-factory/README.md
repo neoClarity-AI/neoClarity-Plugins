@@ -6,7 +6,7 @@ choose, plus the workflows, templates, configs, logs, and a User Guide that make
 them work together. It can also add or rebuild a single agent later.
 
 This plugin is a **rendering** of the AOS Factory design specification
-(`spec_version` 2.2.2). The specification is the single source of truth; the
+(`spec_version` 2.2.3). The specification is the single source of truth; the
 builders, skills, and templates here are generated from it.
 
 ## What's inside
@@ -18,6 +18,12 @@ builders, skills, and templates here are generated from it.
 - **`skills/build-agent/`** — the generic build engine. Builds any one approved
   agent from its catalog entry, profile, and interview script — used during
   initial setup and to add an optional agent later.
+- **`agent-catalog.yaml`**, **`agent-specs/`**, and **`aos-interviews.md`** —
+  the rendered design artifacts the builders read as their source of truth: the
+  machine-checked agent identity/ownership catalog, each agent's behavioral
+  profile and scripted interviews, and the AOS setup interview script. They ship
+  at the plugin root, byte-identical to the factory sources; the skills resolve
+  them from the installed plugin directory and never invent their content.
 - **`templates/aos-router.md`** and **`templates/CLAUDE.md`** — example
   workspace-root files you copy to your AOS Workspace root after install.
 - **`builder-changelog.md`** — framework-file and packaging change history.
@@ -56,7 +62,7 @@ overwritten, moved, renamed, or deleted without a separate `Proceed`.
 ## Versioning
 
 The plugin version tracks the framework `spec_version` and the
-`builder-changelog.md`. This release is **2.2.2**.
+`builder-changelog.md`. This release is **2.2.3**.
 
 ## Contributing
 

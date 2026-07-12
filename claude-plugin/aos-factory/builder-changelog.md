@@ -1,7 +1,7 @@
 ---
 title: AOS Factory Builder Changelog
 file_type: builder_changelog
-spec_version: 2.2.2
+spec_version: 2.2.3
 created_date: 2026-07-06
 last_updated: 2026-07-11
 status: active
@@ -19,9 +19,23 @@ Entries are in reverse chronological order (newest first).
 
 | spec_version | Date       | Plugin version | Summary |
 |--------------|------------|----------------|---------|
+| 2.2.3        | 2026-07-11 | 2.2.3 (packaged, not published) | Plugin packaging fix (design spec §28.2, runbook §36.3): the rendered design artifacts `agent-catalog.yaml`, `agent-specs/` (all 15 agents' `profile.md` + `interviews.md`), and `aos-interviews.md` now ship at the plugin root, byte-identical to their factory-root sources — previously the plugin shipped only skills, templates, README, and this changelog, so the builder skills' required inputs were absent from a plugin-only install. Both `SKILL.md` resolution notes and the plugin README updated to state the artifacts resolve at the plugin root. No changes to the artifacts or builders themselves |
 | 2.2.2        | 2026-07-11 | 2.2.2 (packaged, not published) | Re-render of the full framework from `spec_version` 2.2.2 (runbook §36.2) after deletion of the prior framework. Carries in the 2.1.4–2.2.1 design changes already reflected in the rendered artifacts and `/builders/build-aos.md` (purpose-category agent bundles, quarterly-review retirement, Rhythmic Workflow Scheduling with single `@`-path task instructions); 2.2.2 itself is a version reconciliation only — authored files restamped, no content changes |
 | 2.1.1        | 2026-07-09 | not published  | Re-render of the full framework from `spec_version` 2.1.1 (§4.1 `/outputs` subtree fix, §16.6 spec_version-stamp fix carried in from the design spec) — no structural changes to the builder files themselves, all frontmatter restamped |
 | 2.1.0        | 2026-07-06 | not published  | Initial framework generation: root entry, generic build engine + master AOS builder, and rendered design artifacts (catalog, agent-specs, aos-interviews) |
+
+## 2.2.3 — Plugin packaging fix: ship the rendered design artifacts (2026-07-11)
+
+Packaging-only release closing the gap that made a plugin-only install unable to
+run a spec-faithful build. The builder skills hard-require `agent-catalog.yaml`,
+`agent-specs/`, and `aos-interviews.md` ("resolve them from the installed
+factory / plugin context"), but the §28.2 plugin layout and runbook §36.3
+generation steps never copied them into the package. Design spec 2.2.3 adds the
+three rendered artifacts to the required plugin layout (byte-identical to their
+factory-root sources; a package missing any of them is invalid), and the plugin
+was regenerated accordingly. The `SKILL.md` resolution notes and the plugin
+README now state the artifacts ship at the plugin root. The artifacts and
+builder files themselves are unchanged from 2.2.2.
 
 ## 2.2.2 — Full re-render at version reconciliation (2026-07-11)
 
