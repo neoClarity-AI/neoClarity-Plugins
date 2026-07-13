@@ -1,37 +1,40 @@
 ---
-title: AOS Workspace Instructions
+title: AOS Workspace Instructions (Example)
 file_type: project_instructions
-spec_version: 2.2.3
+spec_version: 2.3.2
 ---
-# AOS Workspace Instructions
+# AOS Workspace — Session Instructions
 
-This is the AOS Workspace root. Copy this file (and `aos-router.md`) here after
-installing the `aos-factory` plugin. These instructions apply to every request in
-this workspace. Required sections follow (§16.11).
+This is an **example** workspace-root `/CLAUDE.md`. During AOS setup,
+`build-aos` provisions it into your AOS Workspace root (creating it when absent;
+overwriting an existing one only after a separate `Proceed`). Edit it for your
+setup after install. It renders the schema in the design spec §16.10.
 
-## Router Wiring
+## Factory-vs-Instance Guard
 
-Before any workflow, read `/aos-router.md` and resolve the active target using its
-Resolution Order. Exactly one target (the factory framework or a single instance)
-is active per request. Never blend instance memory; for a cross-instance request,
-run each instance separately with labeled output. State the resolved target on the
-first line of any routed output (e.g. `**[work-aos]** …`). If routing is ambiguous
-or signals are mixed or weak, ASK — do not silently pick.
+Before running any workflow, determine whether the request targets the **AOS
+Factory** (`aos-factory/`, the builders) or the **generated AOS instance**
+(`/[aos-name]/`). There is one AOS Workspace hosting the factory and exactly one
+AOS instance as sibling folders (single-instance model, §1.6.6) — there is no
+separate router file.
+
+- If the request is ambiguous, **ask — do not silently guess** which target is
+  meant.
+- The Chief of Staff Agent owns this guard and logs non-trivial guard decisions
+  to its own decision log (`/[aos-name]/agents/chief-of-staff-agent/logs/chief-of-staff-decision-log.md`).
 
 ## Planning-Mode Rules
 
 - Planning mode is active when the user's message begins with "Planning mode" or
   "pmode".
-- While in planning mode:
-  - Always show reasoning.
-  - Offer options and a recommendation when an issue is identified.
-  - Do NOT create, edit, rename, move, or delete any files.
-  - Only read files, research, and present a proposed plan.
-  - Wait for the user to type exactly: `Proceed` — before making any changes.
-- Refining, adjusting, or approving a plan in conversation is NOT a `Proceed`.
-  Only the exact word counts. This exact-`Proceed` gate applies to every
-  file-creating or destructive action (§2.5, §3.1–§3.2), not only planning mode.
+- While in planning mode: show reasoning; offer options with a recommendation;
+  do **not** create, edit, rename, move, or delete any files; only read,
+  research, and present a proposed plan. Wait for the user to type exactly
+  `Proceed` before making any changes.
+- `Proceed` is the **only** exact-string command in the AOS. It is the approval
+  gate for every Level 2 action (design spec §3.1); refining or approving a plan
+  in conversation is not a `Proceed`.
 
-## Include the standard AGENTS.md file
+## Include AGENTS.md
 
 @AGENTS.md

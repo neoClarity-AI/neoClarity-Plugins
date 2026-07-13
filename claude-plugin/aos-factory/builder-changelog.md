@@ -1,120 +1,63 @@
 ---
 title: AOS Factory Builder Changelog
 file_type: builder_changelog
-spec_version: 2.2.3
-created_date: 2026-07-06
-last_updated: 2026-07-11
+spec_version: 2.3.2
+created_date: 2026-07-13
+last_updated: 2026-07-13
 status: active
 ---
 # AOS Factory Builder Changelog
 
-Tracks changes to the reusable builder framework files and their packaging (§14.5,
-§16.9). Numbered by `spec_version` but distinct from the design
-`aos-factory-revision-history.md`: that file is the **design** audit trail and
-lives with the spec; this changelog tracks **framework-file and packaging**
-changes and ships inside the plugin (§28). When the framework is distributed as a
-Claude plugin, entries note the plugin version.
+Tracks changes to the **framework files** and their **packaging** (design spec
+§14.5, §16.9). This is distinct from `design-spec/aos-factory-revision-history.md`,
+which is the design audit trail: same `spec_version` numbering, different purpose
+and audience. When the framework is distributed as a Claude plugin (§28), the
+plugin version is kept in sync with `spec_version` (§14.1) and noted below.
 
 Entries are in reverse chronological order (newest first).
 
-| spec_version | Date       | Plugin version | Summary |
-|--------------|------------|----------------|---------|
-| 2.2.3        | 2026-07-11 | 2.2.3 (packaged, not published) | Plugin packaging fix (design spec §28.2, runbook §36.3): the rendered design artifacts `agent-catalog.yaml`, `agent-specs/` (all 15 agents' `profile.md` + `interviews.md`), and `aos-interviews.md` now ship at the plugin root, byte-identical to their factory-root sources — previously the plugin shipped only skills, templates, README, and this changelog, so the builder skills' required inputs were absent from a plugin-only install. Both `SKILL.md` resolution notes and the plugin README updated to state the artifacts resolve at the plugin root. No changes to the artifacts or builders themselves |
-| 2.2.2        | 2026-07-11 | 2.2.2 (packaged, not published) | Re-render of the full framework from `spec_version` 2.2.2 (runbook §36.2) after deletion of the prior framework. Carries in the 2.1.4–2.2.1 design changes already reflected in the rendered artifacts and `/builders/build-aos.md` (purpose-category agent bundles, quarterly-review retirement, Rhythmic Workflow Scheduling with single `@`-path task instructions); 2.2.2 itself is a version reconciliation only — authored files restamped, no content changes |
-| 2.1.1        | 2026-07-09 | not published  | Re-render of the full framework from `spec_version` 2.1.1 (§4.1 `/outputs` subtree fix, §16.6 spec_version-stamp fix carried in from the design spec) — no structural changes to the builder files themselves, all frontmatter restamped |
-| 2.1.0        | 2026-07-06 | not published  | Initial framework generation: root entry, generic build engine + master AOS builder, and rendered design artifacts (catalog, agent-specs, aos-interviews) |
+| spec_version | Plugin version | Date       | Summary                                                        |
+| ------------ | -------------- | ---------- | -------------------------------------------------------------- |
+| 2.3.2        | 2.3.2          | 2026-07-13 | Factory framework generated from spec_version 2.3.2 (§36.2).   |
+| 2.1.0        | 2.1.0          | 2026-07-06 | Generic build engine replaces the 14 per-agent builders.       |
+| 2.0.0        | 2.0.0          | 2026-07-01 | Agent Catalog + per-agent profiles; factory ships rendered artifacts. |
+| 1.0.4        | 1.0.4          | 2026-06-11 | Claude plugin packaging defined (§28.2).                       |
 
-## 2.2.3 — Plugin packaging fix: ship the rendered design artifacts (2026-07-11)
+## 2.3.2 — Factory framework generation (2026-07-13)
 
-Packaging-only release closing the gap that made a plugin-only install unable to
-run a spec-faithful build. The builder skills hard-require `agent-catalog.yaml`,
-`agent-specs/`, and `aos-interviews.md` ("resolve them from the installed
-factory / plugin context"), but the §28.2 plugin layout and runbook §36.3
-generation steps never copied them into the package. Design spec 2.2.3 adds the
-three rendered artifacts to the required plugin layout (byte-identical to their
-factory-root sources; a package missing any of them is invalid), and the plugin
-was regenerated accordingly. The `SKILL.md` resolution notes and the plugin
-README now state the artifacts ship at the plugin root. The artifacts and
-builder files themselves are unchanged from 2.2.2.
+Plugin version: **2.3.2** (synced to `spec_version`).
 
-## 2.2.2 — Full re-render at version reconciliation (2026-07-11)
+Generated the AOS Factory framework files from the design specification at
+`spec_version 2.3.2` (runbook §36.2, generation scope §35.2):
 
-Full re-render of the AOS Factory framework files from `spec_version` 2.2.2
-(runbook §36.2), following deletion of the prior framework files. Between the
-last generation (2.1.1) and this one, the design advanced through 2.1.4–2.2.1
-(purpose-category default agent bundles in `aos-interviews.md`; retirement of
-the Quarterly Review Workflow into the Monthly Review; the new Rhythmic
-Workflow Scheduling step in `build-aos.md` with the single `@`-path
-Scheduled-Task instruction rule) — those changes were already applied to the
-rendered artifacts and `/builders/build-aos.md` as the spec evolved, and this
-generation carries them forward. Spec 2.2.2 itself was a §36.1 version
-reconciliation (runbook frontmatter drift) with no content changes, so the
-authored files are restamped to 2.2.2 with no substantive edits, and the
-rendered artifacts (catalog, agent-specs, aos-interviews) are verified
-byte-identical to their `design-spec/` sources, which retain their own
-per-file `spec_version` stamps (catalog 2.2.0, interviews 2.1.4, profiles
-2.2.0/2.2.1).
+- `/build-aos.md` — root entry pointer to `/builders/build-aos.md` (§8.3).
+- `/builders/build-aos.md` — master AOS instance builder (§12.1).
+- `/builders/build-agent.md` — generic agent build engine (§12).
+- `/builder-changelog.md` — this file (§16.9).
+- Rendered factory-root copies of the design-spec sources, byte-identical to
+  their sources (§7A.4, §7B.2, §7C.2): `/agent-catalog.yaml`, `/aos-interviews.md`,
+  and `/agent-specs/[agent-name]-agent/` (profile.md + interviews.md) for all
+  15 agents in §7.3.
 
-## 2.1.1 — Version-sync re-render (2026-07-09)
+No functional change to the builder logic relative to the design at 2.3.2; this
+is the framework rendering of the current spec.
 
-Full re-render of the AOS Factory framework files from `spec_version` 2.1.1
-(runbook §36.2), following a manual deletion of the prior 2.1.0 framework. The
-design spec advanced from 2.1.0 → 2.1.1 via a §36.1 Design Readiness Review that
-resolved two functionality-impacting inconsistencies (revision history 2.1.1):
-the §4.1 instance tree gained the missing `/outputs` subtree, and the §16.6
-guide-skeleton metadata line gained the missing `spec_version` stamp. Neither
-change altered the content of the four authored builder files — the `/outputs`
-subtree was already present in `/builders/build-aos.md`'s Folder Structure to
-Create, and §16.6 is generated dynamically at instance-build time from the
-design spec rather than hardcoded here. This generation therefore carries the
-four authored files forward unchanged in substance, restamped to 2.1.1, and
-re-copies the three rendered-artifact categories fresh from their (already
-2.1.1) `design-spec/` sources.
+## 2.1.0 — Generic build engine (2026-07-06)
 
-Framework files generated (§35.2):
+Plugin version: **2.1.0**. Collapsed the 14 per-agent `build-[agent-name]-agent.md`
+builders into a single generic engine, `/builders/build-agent.md`, that
+instantiates any validated catalog entry + profile + interviews into the §5.1
+file set (§8.1). Per-agent interview content moved to §7C `interviews.md`
+scripts. Feedback Agent added as the fifth governance agent.
 
-1. **Root entry** — `/build-aos.md` (`file_type: builder_entry`), a short pointer
-   to `/builders/build-aos.md` (§8.3).
+## 2.0.0 — Agent Catalog and Profiles; factory self-containment (2026-07-01)
 
-2. **Builders** — `/builders/build-aos.md` (`aos_builder`, §12.1, the master AOS
-   builder) and `/builders/build-agent.md` (`agent_builder`, §12, the generic
-   build engine).
+Plugin version: **2.0.0**. Factory now renders root copies of `agent-catalog.yaml`
+and the per-agent design artifacts so an installed plugin can run a spec-faithful
+build. Builder files became projections of the catalog (§7A) and profiles (§7B).
 
-3. **Rendered design artifacts** (read-only inside instances, §14.8) — a factory-root
-   copy of `agent-catalog.yaml` (§7A.4), the `agent-specs/[agent-name]-agent/`
-   folders holding `profile.md` (§7B) and `interviews.md` (§7C) for all 15
-   §7.3 agents, and `aos-interviews.md` (§7C/§12.1). Each is rendered from its
-   `design-spec/` source.
+## 1.0.4 — Plugin packaging (2026-06-11)
 
-4. **Changelog** — this file (`builder_changelog`, §16.9).
-
-Every generated file's frontmatter is stamped with `spec_version: 2.1.1` (§35.1,
-§15). No user-specific AOS instance was generated in this phase (§35.1).
-
-## 2.1.0 — Initial framework generation (2026-07-06)
-
-First generation of the AOS Factory framework files from `spec_version` 2.1.0
-(runbook §36.2), following a manual deletion of the prior framework. This is an
-internal milestone: no plugin is published at 2.1.0 (§36.3 plugin generation is a
-separate, later step).
-
-Framework files generated (§35.2):
-
-1. **Root entry** — `/build-aos.md` (`file_type: builder_entry`), a short pointer
-   to `/builders/build-aos.md` (§8.3).
-
-2. **Builders** — `/builders/build-aos.md` (`aos_builder`, §12.1, the master AOS
-   builder) and `/builders/build-agent.md` (`agent_builder`, §12, the generic
-   build engine). The former 14 per-agent builders are collapsed into the single
-   generic engine (§8.1); their interview content lives on as the §7C scripts.
-
-3. **Rendered design artifacts** (read-only inside instances, §14.8) — a factory-root
-   copy of `agent-catalog.yaml` (§7A.4), the `agent-specs/[agent-name]-agent/`
-   folders holding `profile.md` (§7B) and `interviews.md` (§7C) for all 15
-   §7.3 agents, and `aos-interviews.md` (§7C/§12.1). Each is rendered from its
-   `design-spec/` source.
-
-4. **Changelog** — this file (`builder_changelog`, §16.9).
-
-Every generated file's frontmatter is stamped with `spec_version: 2.1.0` (§35.1,
-§15). No user-specific AOS instance was generated in this phase (§35.1).
+Plugin version: **1.0.4**. Defined the Claude plugin layout and packaging steps
+(§28.2): `.claude-plugin/plugin.json` manifest, one skill per builder, shipped
+example workspace-root templates, and README.

@@ -1,76 +1,81 @@
-# AOS Factory (Claude Plugin)
+# AOS Factory — Claude Plugin
 
-The **AOS Factory** stands up a complete **Agentic Operating System (AOS)** inside
-a Claude workspace: the required governance agents, the productive agents you
-choose, plus the workflows, templates, configs, logs, and a User Guide that make
-them work together. It can also add or rebuild a single agent later.
+Build a complete, governed **Agentic Operating System (AOS)** — a personal or
+professional system of specialized markdown agents, workflows, memory, templates,
+configs, logs, and documentation — through a guided, approval-gated interview.
 
-This plugin is a **rendering** of the AOS Factory design specification
-(`spec_version` 2.2.3). The specification is the single source of truth; the
-builders, skills, and templates here are generated from it.
+This plugin is a rendering of the AOS Factory design specification
+(`spec_version 2.3.2`). The specification is the single source of truth; this
+package is generated from it (design spec §1.6.1, §28).
 
-## What's inside
+## What's in the box
 
-- **`skills/build-aos/`** — the master builder. Runs the interactive setup
-  interview, creates the instance folder tree and global files, provisions the
-  workspace root, builds the required governance agents and your selected
-  optional agents, and writes a setup summary.
-- **`skills/build-agent/`** — the generic build engine. Builds any one approved
-  agent from its catalog entry, profile, and interview script — used during
-  initial setup and to add an optional agent later.
-- **`agent-catalog.yaml`**, **`agent-specs/`**, and **`aos-interviews.md`** —
-  the rendered design artifacts the builders read as their source of truth: the
-  machine-checked agent identity/ownership catalog, each agent's behavioral
-  profile and scripted interviews, and the AOS setup interview script. They ship
-  at the plugin root, byte-identical to the factory sources; the skills resolve
-  them from the installed plugin directory and never invent their content.
-- **`templates/aos-router.md`** and **`templates/CLAUDE.md`** — example
-  workspace-root files you copy to your AOS Workspace root after install.
-- **`builder-changelog.md`** — framework-file and packaging change history.
+```text
+.claude-plugin/plugin.json     Plugin manifest (name, version, author)
+skills/
+  build-aos/SKILL.md           Stand up a full AOS instance (master builder)
+  build-agent/SKILL.md         Build one agent — the generic engine, covers every agent
+agent-catalog.yaml             Agent identity/ownership catalog (read-only in instances)
+agent-specs/[agent]/           profile.md + interviews.md for all 15 agents
+aos-interviews.md              AOS-level setup interview script
+builder-changelog.md           Framework/plugin changelog
+templates/
+  CLAUDE.md                    Example workspace-root session instructions
+  AGENTS.md                    Example workspace-root cross-agent rules
+```
+
+The agents built by this factory:
+
+- **Required governance (always built, cannot be removed):** Security, Memory,
+  Chief of Staff, Review, Feedback.
+- **Optional productive (choose at least one):** Tutor, Inbox, Calendar, Task,
+  Project Manager, Research, Writing, Document, Personal CRM, Automation.
 
 ## Install
 
-1. Add the marketplace that publishes this plugin, then install `aos-factory`
-   from it (the repo's `.claude-plugin/marketplace.json` points at this
-   directory as the plugin `source`).
-2. After installing, copy the two example files from `templates/` into your AOS
-   Workspace root:
-   - `templates/aos-router.md` → `/aos-router.md`
-   - `templates/CLAUDE.md` → `/CLAUDE.md`
-   The `build-aos` skill will also create these for you (non-destructively) on
-   first build if they are absent.
+**Via marketplace (recommended):**
+
+```text
+/plugin marketplace add neoClarity-AI/Open-AOS-Factory
+/plugin install aos-factory
+```
+
+**Local, without installing (for testing):**
+
+```text
+claude --plugin-dir <path-to>/claude-plugin/aos-factory
+```
+
+Local `.zip` loading requires Claude Code v2.1.128 or later.
 
 ## Usage
 
-Ask Claude to build an AOS and the `build-aos` skill takes over:
+1. **Build your AOS.** Ask to *"Build my AOS"* (or run the `build-aos` skill).
+   The builder runs a short setup interview — purpose, name, and which optional
+   agents you want first — then previews everything it will create.
+2. **Approve.** Nothing is written until you type exactly `Proceed`. `Proceed`
+   is the **only** exact-string command in the AOS; it is the approval gate for
+   every consequential action (design spec §3.1).
+3. **Provision the workspace root.** During setup the builder provisions
+   `/CLAUDE.md` and `/AGENTS.md` at your AOS Workspace root from the shipped
+   `templates/` examples — non-destructively (created when absent; an existing
+   file is overwritten only after a separate `Proceed`).
+4. **Add agents later.** Ask to *"Build the Research Agent"* (or any agent) to
+   run the generic `build-agent` engine against an existing instance.
 
-> "Set up a new AOS for my consulting work."
+## Safety model
 
-It runs the setup interview, previews everything it will create, and waits for you
-to type exactly `Proceed` before writing any files. To add one agent to an
-existing instance, the `build-agent` engine handles it:
-
-> "Build the Research Agent."
-
-### Safety model
-
-Every builder defaults to **dry-run / preview** and gates file creation behind the
-exact string `Proceed`. Approval is action-specific: each `Proceed` authorizes
-only the action described immediately before it. Existing files are never
-overwritten, moved, renamed, or deleted without a separate `Proceed`.
-
-## Versioning
-
-The plugin version tracks the framework `spec_version` and the
-`builder-changelog.md`. This release is **2.2.3**.
+- **Non-destructive by default** — agents create, append, or ask; they never
+  delete, overwrite, move, rename, or archive without explicit approval.
+- **Approval is action-specific** — a `Proceed` authorizes only the action just
+  described, never future ones.
+- **Governance before productivity** — the five governance agents are built
+  first and cannot be removed.
 
 ## Contributing
 
-The repository accepts pull requests **only against the design specification**.
-The prebuilt factory and this plugin are regenerated and published from the
-approved spec, so every released artifact traces back to a reviewed design. To
-change the official factory or plugin, change the spec.
+Changes flow through the design specification only. The repository accepts pull
+requests **against the spec**; the factory and this plugin are regenerated and
+published from the approved spec (design spec §1.6.10).
 
-## License
-
-MIT © neoClarity
+Project home: https://github.com/neoClarity-AI/Open-AOS-Factory
